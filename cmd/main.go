@@ -20,7 +20,7 @@ func main() {
 
 	authRepo := repository.NewAuthRepository(db)
 	authUsecase := usecase.NewAuthUsecase(authRepo)
-	controller.NewAuthHandler(app, authUsecase)
+	controller.NewAuthController(app, authUsecase)
 
 	userRepo := repository.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo)

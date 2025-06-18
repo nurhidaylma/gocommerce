@@ -6,18 +6,18 @@ import (
 	"github.com/nurhidaylma/gocommerce/internal/usecase"
 )
 
-type AuthHandler struct {
+type AuthController struct {
 	usecase usecase.AuthUsecase
 }
 
-func NewAuthHandler(app *fiber.App, u usecase.AuthUsecase) {
-	h := &AuthHandler{u}
+func NewAuthController(app *fiber.App, u usecase.AuthUsecase) {
+	h := &AuthController{u}
 	api := app.Group("/api/v1/auth")
 	api.Post("/register", h.Register)
 	api.Post("/login", h.Login)
 }
 
-func (h *AuthHandler) Register(c *fiber.Ctx) error {
+func (h *AuthController) Register(c *fiber.Ctx) error {
 	var input domain.User
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid input"})
@@ -28,7 +28,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "registration successful"})
 }
 
-func (h *AuthHandler) Login(c *fiber.Ctx) error {
+func (h *AuthController) Login(c *fiber.Ctx) error {
 	var input struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
