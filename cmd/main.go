@@ -22,6 +22,10 @@ func main() {
 	authUsecase := usecase.NewAuthUsecase(authRepo)
 	controller.NewAuthHandler(app, authUsecase)
 
+	userRepo := repository.NewUserRepository(db)
+	userUsecase := usecase.NewUserUsecase(userRepo)
+	controller.NewUserController(app.Group("/api/v1/user", middleware.JWTProtected()), userUsecase)
+
 	app.Use(middleware.JWTProtected())
 
 	log.Fatal(app.Listen(":8080"))
