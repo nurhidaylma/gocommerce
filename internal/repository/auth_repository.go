@@ -17,6 +17,7 @@ type authRepo struct {
 func NewAuthRepository(db *gorm.DB) AuthRepository {
 	return &authRepo{db}
 }
+
 func (r *authRepo) Register(user *domain.User) error {
 	return r.db.Create(user).Error
 }

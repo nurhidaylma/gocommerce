@@ -28,7 +28,7 @@ func (u *authUsecase) Register(user *domain.User) error {
 	user.Password = string(hashed)
 	user.Role = "user"
 
-	// Buat toko default
+	// Create store automatically
 	user.Store = domain.Store{
 		Name: user.Name + "'s Store",
 	}
