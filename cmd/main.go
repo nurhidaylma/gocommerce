@@ -9,6 +9,7 @@ import (
 	"github.com/nurhidaylma/gocommerce/internal/domain"
 	"github.com/nurhidaylma/gocommerce/internal/repository"
 	"github.com/nurhidaylma/gocommerce/internal/usecase"
+	"github.com/nurhidaylma/gocommerce/middleware"
 )
 
 func main() {
