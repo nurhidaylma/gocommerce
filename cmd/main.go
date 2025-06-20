@@ -14,7 +14,7 @@ import (
 
 func main() {
 	db := config.InitDB()
-	db.AutoMigrate(&domain.User{}, &domain.Store{})
+	db.AutoMigrate(&domain.User{}, &domain.Store{}, &domain.Product{})
 
 	app := fiber.New()
 
@@ -25,6 +25,10 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	controller.NewUserController(app.Group("/api/v1/user", middleware.JWTProtected()), userUsecase)
+
+	productRepo := repository.NewProductRepository(db)
+	productUsecase := usecase.NewProductUsecase(productRepo)
+	controller.NewProductController(app.Group("/api/v1/products", middleware.JWTProtected()), productUsecase)
 
 	app.Use(middleware.JWTProtected())
 
