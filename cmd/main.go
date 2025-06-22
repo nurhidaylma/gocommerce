@@ -14,7 +14,9 @@ import (
 
 func main() {
 	db := config.InitDB()
-	db.AutoMigrate(&domain.User{}, &domain.Store{}, &domain.Product{}, &domain.Address{}, &domain.Category{})
+	db.AutoMigrate(&domain.User{}, &domain.Store{}, &domain.Product{}, &domain.Address{}, &domain.Category{},
+		&domain.Transaction{}, &domain.TransactionItem{}, &domain.LogProduct{},
+	)
 
 	app := fiber.New()
 
@@ -37,6 +39,10 @@ func main() {
 	categoryRepo := repository.NewCategoryRepository(db)
 	categoryUsecase := usecase.NewCategoryUsecase(categoryRepo)
 	controller.NewCategoryController(app.Group("/api/v1/category", middleware.JWTProtected(), middleware.AdminOnly()), categoryUsecase)
+
+	transactionRepo := repository.NewTransactionRepository(db)
+	transactionUsecase := usecase.NewTransactionUsecase(transactionRepo, productRepo)
+	controller.NewTransactionController(app.Group("/api/v1/transactions", middleware.JWTProtected()), transactionUsecase)
 
 	app.Use(middleware.JWTProtected())
 
