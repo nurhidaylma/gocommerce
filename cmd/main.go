@@ -14,7 +14,7 @@ import (
 
 func main() {
 	db := config.InitDB()
-	db.AutoMigrate(&domain.User{}, &domain.Store{}, &domain.Product{}, &domain.Address{})
+	db.AutoMigrate(&domain.User{}, &domain.Store{}, &domain.Product{}, &domain.Address{}, &domain.Category{})
 
 	app := fiber.New()
 
@@ -33,6 +33,10 @@ func main() {
 	addressRepo := repository.NewAddressRepository(db)
 	addressUC := usecase.NewAddressUsecase(addressRepo)
 	controller.NewAddressController(app.Group("/api/v1/address", middleware.JWTProtected()), addressUC)
+
+	categoryRepo := repository.NewCategoryRepository(db)
+	categoryUsecase := usecase.NewCategoryUsecase(categoryRepo)
+	controller.NewCategoryController(app.Group("/api/v1/category", middleware.JWTProtected(), middleware.AdminOnly()), categoryUsecase)
 
 	app.Use(middleware.JWTProtected())
 
