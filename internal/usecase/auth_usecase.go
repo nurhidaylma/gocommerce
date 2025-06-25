@@ -24,6 +24,14 @@ func NewAuthUsecase(r repository.AuthRepository) AuthUsecase {
 }
 
 func (u *authUsecase) Register(user *domain.User) error {
+	existingUser, err := u.repo.FindByEmailOrPhone(user.Email, user.Phone)
+	if err != nil {
+		return err
+	}
+	if existingUser != nil {
+		return errors.New("user already exists")
+	}
+
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	user.Password = string(hashed)
 	user.Role = "user"

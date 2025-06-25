@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/nurhidaylma/gocommerce/internal/domain"
 	"gorm.io/gorm"
 )
@@ -8,6 +10,7 @@ import (
 type AuthRepository interface {
 	Register(user *domain.User) error
 	FindByEmail(email string) (*domain.User, error)
+	FindByEmailOrPhone(email, phone string) (*domain.User, error)
 }
 
 type authRepo struct {
@@ -26,4 +29,21 @@ func (r *authRepo) FindByEmail(email string) (*domain.User, error) {
 	var user domain.User
 	err := r.db.Preload("Store").Where("email = ?", email).First(&user).Error
 	return &user, err
+}
+
+func (r *authRepo) FindByEmailOrPhone(email, phone string) (*domain.User, error) {
+	var user domain.User
+
+	if email == "" || phone == "" {
+		return nil, nil
+	}
+
+	err := r.db.Where("email = ? OR phone = ?", email, phone).First(&user).Error
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+	}
+
+	return &user, nil
 }
