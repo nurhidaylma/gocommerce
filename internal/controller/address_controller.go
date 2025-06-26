@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nurhidaylma/gocommerce/internal/domain"
 	"github.com/nurhidaylma/gocommerce/internal/usecase"
+	"github.com/nurhidaylma/gocommerce/middleware"
 )
 
 type AddressController struct {
@@ -53,6 +54,10 @@ func (h *AddressController) Update(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid input"})
 	}
 	input.ID = uint(id)
+
+	if ok := middleware.IsAuthorized(input.UserID, userID); !ok {
+		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
+	}
 
 	if err := h.usecase.Update(&input, userID); err != nil {
 		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})

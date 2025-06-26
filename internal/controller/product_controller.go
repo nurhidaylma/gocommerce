@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nurhidaylma/gocommerce/internal/domain"
 	"github.com/nurhidaylma/gocommerce/internal/usecase"
+	"github.com/nurhidaylma/gocommerce/middleware"
 )
 
 type ProductController struct {
@@ -59,7 +60,7 @@ func (h *ProductController) GetAll(c *fiber.Ctx) error {
 	filter := c.Query("search")
 	categoryID, _ := strconv.Atoi(c.Query("category_id"))
 	page, _ := strconv.Atoi(c.Query("page"))
-	limit := 10
+	limit := c.QueryInt("limit", 10)
 	offset := (page - 1) * limit
 
 	products, err := h.usecase.GetAll(filter, uint(categoryID), limit, offset)
@@ -87,6 +88,10 @@ func (h *ProductController) Update(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid input"})
 	}
 	input.ID = uint(id)
+
+	if ok := middleware.IsAuthorized(input.UserID, userID); !ok {
+		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
+	}
 
 	if err := h.usecase.Update(&input, userID); err != nil {
 		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
