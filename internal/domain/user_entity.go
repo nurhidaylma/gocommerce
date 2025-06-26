@@ -9,9 +9,3 @@ type User struct {
 	Role     string
 	Store    Store
 }
-
-type Store struct {
-	ID     uint `gorm:"primaryKey"`
-	Name   string
-	UserID uint
-}

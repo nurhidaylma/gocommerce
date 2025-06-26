@@ -15,13 +15,17 @@ import (
 func main() {
 	db := config.InitDB()
 	db.AutoMigrate(&domain.User{}, &domain.Store{}, &domain.Product{}, &domain.Address{}, &domain.Category{},
-		&domain.Transaction{}, &domain.TransactionItem{}, &domain.LogProduct{},
+		&domain.Transaction{}, &domain.TransactionItem{}, &domain.LogProduct{}, &domain.Store{},
 	)
 
 	app := fiber.New()
 
+	storeRepo := repository.NewStoreRepository(db)
+	storeUsecase := usecase.NewStoreUsecase(storeRepo)
+	controller.NewStoreController(app.Group("/api/v1/store", middleware.JWTProtected()), storeUsecase)
+
 	authRepo := repository.NewAuthRepository(db)
-	authUsecase := usecase.NewAuthUsecase(authRepo)
+	authUsecase := usecase.NewAuthUsecase(authRepo, storeRepo)
 	controller.NewAuthController(app, authUsecase)
 
 	userRepo := repository.NewUserRepository(db)

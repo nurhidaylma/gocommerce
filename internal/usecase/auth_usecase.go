@@ -16,11 +16,15 @@ type AuthUsecase interface {
 }
 
 type authUsecase struct {
-	repo repository.AuthRepository
+	repo      repository.AuthRepository
+	storeRepo repository.StoreRepository
 }
 
-func NewAuthUsecase(r repository.AuthRepository) AuthUsecase {
-	return &authUsecase{r}
+func NewAuthUsecase(r repository.AuthRepository, storeRepo repository.StoreRepository) AuthUsecase {
+	return &authUsecase{
+		repo:      r,
+		storeRepo: storeRepo,
+	}
 }
 
 func (u *authUsecase) Register(user *domain.User) error {
@@ -38,7 +42,12 @@ func (u *authUsecase) Register(user *domain.User) error {
 
 	// Create store automatically
 	user.Store = domain.Store{
-		Name: user.Name + "'s Store",
+		UserID: user.ID,
+		Name:   user.Name + "'s Store",
+	}
+	err = u.storeRepo.Create(&user.Store)
+	if err != nil {
+		return err
 	}
 
 	return u.repo.Register(user)
