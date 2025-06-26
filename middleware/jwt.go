@@ -29,11 +29,3 @@ func JWTProtected() fiber.Handler {
 		return c.Next()
 	}
 }
-func AdminOnly() fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		if role, ok := c.Locals("role").(string); !ok || role != "admin" {
-			return c.Status(403).JSON(fiber.Map{"error": "admin only"})
-		}
-		return c.Next()
-	}
-}

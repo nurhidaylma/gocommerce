@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nurhidaylma/gocommerce/internal/domain"
 	"github.com/nurhidaylma/gocommerce/internal/usecase"
+	"github.com/nurhidaylma/gocommerce/middleware"
 )
 
 type UserController struct {
@@ -22,6 +23,11 @@ func (ctrl *UserController) GetProfile(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "user not found"})
 	}
+
+	if ok := middleware.IsAuthorized(user.ID, userID); !ok {
+		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
 	user.Password = "" // hide password
 	return c.JSON(user)
 }
@@ -32,6 +38,11 @@ func (ctrl *UserController) UpdateProfile(c *fiber.Ctx) error {
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid input"})
 	}
+
+	if ok := middleware.IsAuthorized(input.ID, userID); !ok {
+		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
+	}
+
 	input.ID = userID
 	if err := ctrl.usecase.UpdateProfile(&input); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
