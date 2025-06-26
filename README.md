@@ -4,14 +4,14 @@ Gocommerce is a clean, modular, and production-ready e-commerce REST API built u
 
 ## ✨ Features
 
-- 🔐 JWT-based authentication (Login & Register)
-- 🛒 Product, Category, and Transaction management
-- 🏪 Store auto-created on user registration
-- 📦 File upload (product photos & store logos)
-- 📍 Address book with filtering
-- 🔎 Pagination & filtering for listing endpoints
-- 🛡️ Ownership and role-based access control (admin only category access)
-- 📊 Product logs saved during transactions
+- JWT-based authentication (Login & Register)
+- Product, Category, and Transaction management
+- Store auto-created on user registration
+- File upload (product photos & store logos)
+- Address book with filtering
+- Pagination & filtering for listing endpoints
+- Ownership and role-based access control (admin only category access)
+- Product logs saved during transactions
 
 ## 🧱 Tech Stack
 
