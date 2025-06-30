@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/nurhidaylma/gocommerce/internal/dto"
 	"github.com/nurhidaylma/gocommerce/internal/usecase"
 )
 
@@ -30,20 +31,26 @@ func (h *StoreController) Update(c *fiber.Ctx) error {
 	userID := c.Locals("user_id").(uint)
 
 	name := c.FormValue("name")
-	file, err := c.FormFile("logo")
-	if err != nil {
-		return err
-	}
 
 	var logoPath string
-	if file != nil {
+	file, err := c.FormFile("logo")
+	if file == nil {
+		// logo optional, nothing to do
+	} else if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	} else {
 		logoPath = fmt.Sprintf("uploads/%d_%s", userID, file.Filename)
 		if err := c.SaveFile(file, logoPath); err != nil {
 			return c.Status(500).JSON(fiber.Map{"error": "failed to save file"})
 		}
 	}
 
-	if err := h.usecase.Update(userID, name, logoPath); err != nil {
+	request := dto.UpdateStoreRequest{
+		UserID: userID,
+		Name:   name,
+		Logo:   logoPath,
+	}
+	if err := h.usecase.Update(&request); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 

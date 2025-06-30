@@ -42,5 +42,14 @@ func (r *addressRepo) Update(a *domain.Address) error {
 }
 
 func (r *addressRepo) Delete(id, userID uint) error {
-	return r.db.Where("id = ? AND user_id = ?", id, userID).Delete(&domain.Address{}).Error
+	result := r.db.Where("id = ? AND user_id = ?", id, userID).Delete(&domain.Address{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }

@@ -2,12 +2,13 @@ package usecase
 
 import (
 	"github.com/nurhidaylma/gocommerce/internal/domain"
+	"github.com/nurhidaylma/gocommerce/internal/dto"
 	"github.com/nurhidaylma/gocommerce/internal/repository"
 )
 
 type StoreUsecase interface {
 	GetByUserID(userID uint) (*domain.Store, error)
-	Update(userID uint, name, logo string) error
+	Update(store *dto.UpdateStoreRequest) error
 }
 
 type storeUsecase struct {
@@ -22,14 +23,17 @@ func (s *storeUsecase) GetByUserID(userID uint) (*domain.Store, error) {
 	return s.repo.GetByUserID(userID)
 }
 
-func (s *storeUsecase) Update(userID uint, name, logo string) error {
-	store, err := s.repo.GetByUserID(userID)
+func (s *storeUsecase) Update(request *dto.UpdateStoreRequest) error {
+	store, err := s.repo.GetByUserID(request.UserID)
 	if err != nil {
 		return err
 	}
-	store.Name = name
-	if logo != "" {
-		store.Logo = logo
+
+	if request.Name != "" {
+		store.Name = request.Name
+	}
+	if request.Logo != "" {
+		store.Logo = request.Logo
 	}
 	return s.repo.Update(store)
 }

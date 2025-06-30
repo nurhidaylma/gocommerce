@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nurhidaylma/gocommerce/internal/domain"
 	"github.com/nurhidaylma/gocommerce/internal/usecase"
-	"github.com/nurhidaylma/gocommerce/middleware"
+	"gorm.io/gorm"
 )
 
 type AddressController struct {
@@ -55,10 +56,6 @@ func (h *AddressController) Update(c *fiber.Ctx) error {
 	}
 	input.ID = uint(id)
 
-	if ok := middleware.IsAuthorized(input.UserID, userID); !ok {
-		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
-	}
-
 	if err := h.usecase.Update(&input, userID); err != nil {
 		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
 	}
@@ -70,7 +67,11 @@ func (h *AddressController) Delete(c *fiber.Ctx) error {
 	id, _ := strconv.Atoi(c.Params("id"))
 
 	if err := h.usecase.Delete(uint(id), userID); err != nil {
-		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
+		}
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
+
 	return c.JSON(fiber.Map{"message": "deleted"})
 }

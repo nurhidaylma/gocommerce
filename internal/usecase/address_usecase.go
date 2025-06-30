@@ -33,8 +33,25 @@ func (u *addressUsecase) Update(a *domain.Address, userID uint) error {
 	if err != nil || existing.UserID != userID {
 		return err
 	}
-	a.UserID = userID
-	return u.repo.Update(a)
+
+	existing.UserID = userID
+	if a.City != "" {
+		existing.City = a.City
+	}
+	if a.District != "" {
+		existing.District = a.District
+	}
+	if a.PostalCode != "" {
+		existing.PostalCode = a.PostalCode
+	}
+	if a.Province != "" {
+		existing.Province = a.Province
+	}
+	if a.Detail != "" {
+		existing.Detail = a.Detail
+	}
+
+	return u.repo.Update(existing)
 }
 
 func (u *addressUsecase) Delete(id, userID uint) error {

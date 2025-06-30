@@ -29,7 +29,7 @@ func main() {
 	controller.NewAuthController(app, authUsecase)
 
 	userRepo := repository.NewUserRepository(db)
-	userUsecase := usecase.NewUserUsecase(userRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo, storeRepo)
 	controller.NewUserController(app.Group("/api/v1/user", middleware.JWTProtected()), userUsecase)
 
 	productRepo := repository.NewProductRepository(db)

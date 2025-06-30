@@ -14,7 +14,7 @@ type UserController struct {
 func NewUserController(router fiber.Router, u usecase.UserUsecase) {
 	ctrl := &UserController{u}
 	router.Get("/me", ctrl.GetProfile)
-	router.Get("/", ctrl.UpdateProfile)
+	router.Put("/", ctrl.UpdateProfile)
 }
 
 func (ctrl *UserController) GetProfile(c *fiber.Ctx) error {
@@ -37,10 +37,6 @@ func (ctrl *UserController) UpdateProfile(c *fiber.Ctx) error {
 	var input domain.User
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid input"})
-	}
-
-	if ok := middleware.IsAuthorized(input.ID, userID); !ok {
-		return c.Status(403).JSON(fiber.Map{"error": "unauthorized"})
 	}
 
 	input.ID = userID
