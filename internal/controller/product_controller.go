@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"fmt"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nurhidaylma/gocommerce/internal/domain"
@@ -30,7 +33,17 @@ func (h *ProductController) Create(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "image required"})
 	}
 
-	path := "./uploads/" + file.Filename
+	// pastikan upload folder ada
+	if _, err := os.Stat("./uploads"); os.IsNotExist(err) {
+		err = os.Mkdir("./uploads", os.ModePerm)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed to create upload dir"})
+		}
+	}
+
+	safeFileName := fmt.Sprintf("%d_%s", time.Now().Unix(), file.Filename)
+	path := "./uploads/" + safeFileName
+
 	if err := c.SaveFile(file, path); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "upload failed"})
 	}

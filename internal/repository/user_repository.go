@@ -7,7 +7,7 @@ import (
 
 type UserRepository interface {
 	FindByID(id uint) (*domain.User, error)
-	Update(user *domain.User) error
+	Update(id uint, updates map[string]interface{}) error
 }
 
 type userRepo struct {
@@ -24,6 +24,12 @@ func (r *userRepo) FindByID(id uint) (*domain.User, error) {
 	return &user, err
 }
 
-func (r *userRepo) Update(user *domain.User) error {
-	return r.db.Save(user).Error
+func (r *userRepo) Update(id uint, updates map[string]interface{}) error {
+	if len(updates) == 0 {
+		return nil
+	}
+
+	return r.db.Model(&domain.User{}).
+		Where("id = ?", id).
+		Updates(updates).Error
 }

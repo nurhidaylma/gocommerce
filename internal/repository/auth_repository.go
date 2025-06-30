@@ -40,10 +40,12 @@ func (r *authRepo) FindByEmailOrPhone(email, phone string) (*domain.User, error)
 
 	err := r.db.Where("email = ? OR phone = ?", email, phone).First(&user).Error
 	if err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, err
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil // no user found, not an error
+		} else {
+			return nil, err // actual DB error
 		}
 	}
 
-	return &user, nil
+	return &user, nil // user found
 }

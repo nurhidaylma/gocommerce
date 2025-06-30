@@ -40,6 +40,11 @@ func (u *authUsecase) Register(user *domain.User) error {
 	user.Password = string(hashed)
 	user.Role = "user"
 
+	err = u.repo.Register(user)
+	if err != nil {
+		return err
+	}
+
 	// Create store automatically
 	user.Store = domain.Store{
 		UserID: user.ID,
@@ -50,7 +55,7 @@ func (u *authUsecase) Register(user *domain.User) error {
 		return err
 	}
 
-	return u.repo.Register(user)
+	return nil
 }
 
 func (u *authUsecase) Login(email, password string) (string, error) {
